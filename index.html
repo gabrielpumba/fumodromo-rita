@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fumódromo da Rita — Monitor Oficial de Maços & Fumaça</title>
+  
+  <!-- Google Fonts: Serif (DM Serif / Playfair), Marker (Permanent Marker), Mono (Space Mono) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Permanent+Marker&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="zine-theme">
+  <!-- Sombra / Filtro Zine Paper Grain SVG -->
+  <svg class="paper-noise-filter" aria-hidden="true" style="position: absolute; width: 0; height: 0;">
+    <filter id="noiseFilter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.04 0"/>
+    </filter>
+  </svg>
+
+  <div class="site-container">
+    <!-- TOP TICKER TAPE (Loop de Frases Zine da Rita) -->
+    <header class="ticker-tape" id="ticker-section">
+      <div class="tape-badge">EQUAÇÃO DO FUMO 📐</div>
+      <div class="tape-wrapper">
+        <div class="tape-track" id="tape-track">
+          <span class="ticker-item">⚠️ A conta chegou: nem Bhaskara explica tanto maço!</span>
+          <span class="ticker-item">🚬 1 maço = 20 cigarros. Rita fuma em progressão geométrica.</span>
+          <span class="ticker-item">📉 Pitágoras calculou a hipotenusa da fumaça subindo pro céu.</span>
+          <span class="ticker-item">🔥 Se o maço custa R$ 13,00, quanto custa a paz de espírito?</span>
+          <span class="ticker-item">📚 Teorema de Rita: a cada questão corrigida, uma bituca apagada.</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO HEADER -->
+    <header class="hero-header">
+      <div class="hero-brand">
+        <div class="brand-avatar-clip">
+          <img src="fumodromo-rita.png" alt="Logo Rita" class="rita-mini-logo" id="header-avatar-img">
+        </div>
+        <div class="brand-titles">
+          <div class="stamp-pill">PROJETO MATEMÁTICA APLICADA</div>
+          <h1 class="main-title">FUMÓDROMO DA RITA</h1>
+          <p class="tagline">O cigarrômetro oficial baseado no registro rigoroso de maços comprados.</p>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-secondary btn-zine" id="btn-open-sim">
+          <span class="icon">🧪</span> Modo Simulação
+        </button>
+        <!-- Botão Admin com Cadeado -->
+        <button class="btn btn-primary btn-zine" id="btn-admin-auth">
+          <span class="icon" id="admin-icon-status">🔒</span> <span id="admin-btn-text">Área Admin</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- PALCO PRINCIPAL (Grid Duas Colunas: Palco Visual / Painel de Controle) -->
+    <main class="main-stage-grid">
+      
+      <!-- COLUNA ESQUERDA: PALCO VISUAL (.meter-card) -->
+      <section class="meter-card" id="meter-card">
+        <div class="tape-corner top-left"></div>
+        <div class="tape-corner top-right"></div>
+        
+        <div class="card-header-mini">
+          <span class="pill-badge red" id="stage-phase-badge">FASE 1: TRAGADA INICIAL</span>
+          <span class="zoom-indicator" id="zoom-level-text">Escala: 1.0x</span>
+        </div>
+
+        <!-- Palco Interativo -->
+        <div class="interactive-stage" id="stage-interactive" title="Clique ou arraste o cigarro para acender a brasa!">
+          <!-- Réguas de Medição Laterais (Começando em 20 cig = 1 maço) -->
+          <div class="stage-ruler left-ruler">
+            <span class="ruler-mark">2000 cig</span>
+            <span class="ruler-mark">1000 cig</span>
+            <span class="ruler-mark">500 cig</span>
+            <span class="ruler-mark">200 cig</span>
+            <span class="ruler-mark">100 cig</span>
+            <span class="ruler-mark">20 cig (1 maço)</span>
+            <span class="ruler-mark">0</span>
+          </div>
+
+          <!-- Personagem Rita (com caixa de fala posicionada no topo livre, SEM cobrir o rosto) -->
+          <div class="rita-stage-character" id="rita-character">
+            <div class="speech-bubble" id="rita-dynamic-speech">
+              "Trigonometria pura: o ângulo da fumaça não mente!"
+            </div>
+            <img src="fumodromo-rita.png" alt="Professora Rita Falando" id="rita-avatar-img">
+          </div>
+
+          <!-- Cigarro Gigante + Brasa + Fumaça SVG Interativo -->
+          <div class="cigarette-physics-wrapper" id="cig-wrapper">
+            <!-- Nuvem de fumaça gerada dinamicamente -->
+            <div class="smoke-particles-container" id="smoke-container"></div>
+
+            <!-- SVG do Cigarro com Textura de Papel e Filtro -->
+            <svg id="giant-cigarette-svg" viewBox="0 0 100 120" style="width: 72px; height: 120px;">
+              <defs>
+                <linearGradient id="ashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4a3f35" />
+                  <stop offset="50%" stop-color="#8c7e72" />
+                  <stop offset="100%" stop-color="#2c221e" />
+                </linearGradient>
+                <linearGradient id="emberGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ff9900" />
+                  <stop offset="60%" stop-color="#e04a2a" />
+                  <stop offset="100%" stop-color="#7a1400" />
+                </linearGradient>
+                <linearGradient id="paperCigGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#fdfbf7" />
+                  <stop offset="50%" stop-color="#ffffff" />
+                  <stop offset="100%" stop-color="#ece4d3" />
+                </linearGradient>
+                <linearGradient id="filterCorkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#d99b50" />
+                  <stop offset="50%" stop-color="#efb975" />
+                  <stop offset="100%" stop-color="#c18337" />
+                </linearGradient>
+                <filter id="emberBlur">
+                  <feGaussianBlur stdDeviation="3" result="glow" />
+                  <feComposite in="SourceGraphic" in2="glow" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- Brasa viva no topo -->
+              <g id="ember-group" class="ember-pulse">
+                <ellipse cx="50" cy="8" rx="40" ry="7" fill="url(#ashGrad)" />
+                <ellipse id="ember-core" cx="50" cy="7" rx="34" ry="5" fill="url(#emberGlow)" filter="url(#emberBlur)" />
+                <path d="M 22 7 Q 50 12 78 7 Q 50 4 22 7" fill="#ffcc00" opacity="0.85" />
+              </g>
+
+              <!-- Corpo Branco do Cigarro (Cresce de altura) -->
+              <rect id="cig-body" x="12" y="10" width="76" height="20" rx="1" fill="url(#paperCigGrad)" stroke="#1b1512" stroke-width="2.5" />
+
+              <!-- Filtro de Cortiça na base (altura fixa = 65px) -->
+              <g id="cig-filter-group">
+                <rect id="cig-filter" x="12" y="30" width="76" height="65" rx="2" fill="url(#filterCorkGrad)" stroke="#1b1512" stroke-width="2.5" />
+                <!-- Anel divisório -->
+                <rect x="12" y="30" width="76" height="6" fill="#1b1512" />
+                <rect x="12" y="31" width="76" height="3" fill="#f2e8d5" />
+                <!-- Pintinhas do filtro -->
+                <circle cx="26" cy="55" r="1.5" fill="#a46d2a"/>
+                <circle cx="50" cy="65" r="1.8" fill="#a46d2a"/>
+                <circle cx="72" cy="52" r="1.5" fill="#a46d2a"/>
+                <circle cx="38" cy="78" r="1.5" fill="#a46d2a"/>
+                <circle cx="62" cy="84" r="1.5" fill="#a46d2a"/>
+              </g>
+            </svg>
+
+            <!-- Pilha de Maços Acumulados ao lado da base -->
+            <div class="packs-mini-stack" id="packs-mini-stack"></div>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso / Nível de Milestones (Baseada em Maços de 20 em diante) -->
+        <div class="milestones-bar-container">
+          <div class="milestone-label-row">
+            <span class="ms-title">TERMÔMETRO DA FUMAÇA</span>
+            <span class="ms-val" id="growth-meter-label">0 cigarros (Fase 1)</span>
+          </div>
+          <div class="ms-progress-track">
+            <div class="ms-progress-fill" id="growth-progress-fill" style="width: 0%;"></div>
+          </div>
+          <div class="ms-steps">
+            <span class="step-dot" title="1 maço (20 cig)">20 (1 maço)</span>
+            <span class="step-dot" title="5 maços (100 cig)">100 (5 mç)</span>
+            <span class="step-dot" title="25 maços (500 cig)">500 (25 mç)</span>
+            <span class="step-dot" title="50 maços (1000 cig)">1000 (50 mç)</span>
+            <span class="step-dot" title="+100 maços (2000+ cig)">2000+</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- COLUNA DIREITA: PAINEL DE CONTROLE E PLACAR (.control-panel) -->
+      <section class="control-panel" id="control-panel">
+        
+        <!-- PLACAR GIGANTE DO PERÍODO -->
+        <div class="scoreboard-zine">
+          <div class="scoreboard-header">
+            <span class="stamp-tag" id="score-period-tag">VISÃO: SEMANAL (7 DIAS)</span>
+            <span class="projection-badge hidden" id="score-projection-indicator">⚡ PROJEÇÃO ESTIMADA</span>
+          </div>
+
+          <div class="kpi-grid">
+            <!-- Total de Cigarros -->
+            <div class="kpi-card highlight-tomato">
+              <span class="kpi-label">TOTAL DE CIGARROS</span>
+              <div class="kpi-value-row">
+                <span class="kpi-number" id="kpi-total-cigarros">0</span>
+                <span class="kpi-unit">unid.</span>
+              </div>
+              <span class="kpi-subtext" id="kpi-cigarros-sub">0 maços comprados × 20</span>
+            </div>
+
+            <!-- Total Gasto em R$ -->
+            <div class="kpi-card highlight-pool">
+              <span class="kpi-label">GASTO ESTIMADO</span>
+              <div class="kpi-value-row">
+                <span class="kpi-currency">R$</span>
+                <span class="kpi-number" id="kpi-total-gasto">0,00</span>
+              </div>
+              <span class="kpi-subtext" id="kpi-gasto-sub">Média R$ 0,00 / maço</span>
+            </div>
+
+            <!-- Maços Comprados -->
+            <div class="kpi-card highlight-paper">
+              <span class="kpi-label">MAÇOS COMPRADOS</span>
+              <div class="kpi-value-row">
+                <span class="kpi-number" id="kpi-total-macos">0</span>
+                <span class="kpi-unit">maços</span>
+              </div>
+              <span class="kpi-subtext" id="kpi-macos-sub">Registros no período</span>
+            </div>
+
+            <!-- Média Diária -->
+            <div class="kpi-card highlight-ink">
+              <span class="kpi-label">MÉDIA DIÁRIA</span>
+              <div class="kpi-value-row">
+                <span class="kpi-number" id="kpi-media-diaria">0.0</span>
+                <span class="kpi-unit">cig/dia</span>
+              </div>
+              <span class="kpi-subtext" id="kpi-media-sub">Ritmo calculado</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RANKING POR MARCA (Estilo Orelhômetro Categorias) -->
+        <div class="brand-ranking-card">
+          <div class="section-title-tape">
+            <h3>DISTRIBUIÇÃO POR MARCA</h3>
+            <span class="note-pill">Preferências da Rita</span>
+          </div>
+          <div class="brand-bars-list" id="brand-ranking-list">
+            <div class="empty-state-zine">Nenhuma compra cadastrada ainda neste período.</div>
+          </div>
+        </div>
+
+        <!-- AÇÕES DO PAINEL (Botão de Adicionar restrito ao Admin) -->
+        <div class="actions-strip-zine">
+          <!-- Botão protegido por Admin -->
+          <button class="btn btn-tomato btn-block" id="btn-quick-add">
+            ➕ Registrar Compra de Maço <span class="badge-lock" id="quick-add-lock-badge">(Requer Admin)</span>
+          </button>
+          
+          <div class="btn-group-row">
+            <button class="btn btn-secondary btn-block" id="btn-print-placar" title="Gera imagem compartilhável no WhatsApp (Feed ou Story)">
+              📸 Print do Placar
+            </button>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- BARRA DE SELEÇÃO DE PERÍODOS & TOGGLE PROJEÇÃO (LARGURA TOTAL ENTRE O PALCO E "O QUE VIROU FUMAÇA") -->
+    <section class="period-control-bar" id="period-control-bar-main">
+      <div class="period-tabs-group" role="tablist" aria-label="Recortes de Tempo">
+        <button class="tab-btn active" data-period="7d">Semanal (7d)</button>
+        <button class="tab-btn" data-period="15d">Quinzenal (15d)</button>
+        <button class="tab-btn" data-period="1m">Mensal (30d)</button>
+        <button class="tab-btn" data-period="3m">Trimestral (90d)</button>
+        <button class="tab-btn" data-period="6m">Semestral (180d)</button>
+        <button class="tab-btn" data-period="1a">Anual (365d)</button>
+      </div>
+
+      <div class="projection-toggle-box">
+        <label class="switch-label" for="toggle-projection">
+          <input type="checkbox" id="toggle-projection">
+          <span class="switch-slider"></span>
+          <span class="switch-text">Projeção no Ritmo Atual</span>
+        </label>
+        <span class="info-bubble" title="Projeta o consumo com base na média diária dos registros mais recentes, perfeito para quando há poucos dias lançados!">ℹ️</span>
+      </div>
+    </section>
+
+    <!-- CALCULADORA "O QUE VIROU FUMAÇA" (Equivalências Financeiras) -->
+    <section class="what-burned-section">
+      <div class="section-badge-center">ECONOMIA POPULAR DA RITA</div>
+      <h2 class="section-headline">O Que Virou Fumaça?</h2>
+      <p class="section-subheadline">
+        Conversão direta do gasto acumulado (<strong id="equiv-money-total">R$ 0,00</strong>) no período selecionado:
+      </p>
+
+      <div class="equivalencies-grid" id="equivalencies-grid"></div>
+    </section>
+
+    <!-- HISTÓRICO DE COMPRAS E CADASTROS (Tabela Filtrável) -->
+    <section class="history-section">
+      <div class="history-card-zine">
+        <div class="history-top-bar">
+          <div>
+            <h2 class="history-title">Caderno de Compras</h2>
+            <p class="history-subtitle">Extrato completo de maços adquiridos pela professora.</p>
+          </div>
+          
+          <div class="history-filters">
+            <input type="month" id="filter-month" class="zine-input-sm" title="Filtrar por Mês">
+            <select id="filter-brand" class="zine-select-sm">
+              <option value="all">Todas as Marcas</option>
+            </select>
+            <button class="btn btn-sm btn-ghost" id="btn-clear-filters">Limpar Filtros</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="zine-table" id="purchases-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Marca</th>
+                <th>Qtd. Maços</th>
+                <th>Cigarros</th>
+                <th>Valor Unit.</th>
+                <th>Subtotal</th>
+                <th class="text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="purchases-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER DA ZINE -->
+    <footer class="site-footer">
+      <div class="footer-content">
+        <div class="big-solutions-badge">
+          <img src="big-solutions.png" alt="Logo BIG Solutions" class="big-logo-img">
+          <span class="created-by-text">Desenvolvido por <strong>BIG Solutions</strong></span>
+        </div>
+        <p><strong>Fumódromo da Rita</strong> — Criado com carinho e trigonometria pura para monitorar os maços de dona Rita.</p>
+        <p class="footer-credit">Inspirado na arquitetura do <em>orelhometro.com.br</em> | Estilo Zine Paper Collage 2020s.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- MODAL: LOGIN / AUTENTICAÇÃO DO ADMIN -->
+  <div class="modal-backdrop" id="admin-login-modal" aria-hidden="true">
+    <div class="modal-card-zine" style="max-width: 420px;">
+      <div class="modal-top-tape"></div>
+      <button class="modal-close-btn" id="btn-close-admin-modal" aria-label="Fechar">✕</button>
+      
+      <div class="modal-header">
+        <h2>Área Administrativa 🔐</h2>
+        <p>Apenas quem tem a senha pode cadastrar, editar ou apagar registros de maços.</p>
+      </div>
+
+      <form id="admin-login-form">
+        <div class="form-group" style="margin-bottom: 1.2rem;">
+          <label for="admin-pass-input">Senha de Acesso:</label>
+          <input type="password" id="admin-pass-input" class="zine-input" required placeholder="Digite sua senha..." autocomplete="current-password">
+        </div>
+
+        <div class="modal-footer-btns">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-admin-login">Cancelar</button>
+          <button type="submit" class="btn btn-tomato">Entrar como Admin</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR / EDITAR COMPRA DE MAÇO (APENAS ADMIN) -->
+  <div class="modal-backdrop" id="purchase-modal" aria-hidden="true">
+    <div class="modal-card-zine" role="dialog" aria-labelledby="modal-title">
+      <div class="modal-top-tape"></div>
+      <button class="modal-close-btn" id="btn-close-modal" aria-label="Fechar">✕</button>
+      
+      <div class="modal-header">
+        <h2 id="modal-title">Novo Registro de Maços</h2>
+        <p>Informe a quantidade de maços e valores para recalcular o Fumódromo automaticamente.</p>
+      </div>
+
+      <form id="purchase-form">
+        <input type="hidden" id="edit-purchase-id" value="">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="input-date">Data da Compra:</label>
+            <input type="date" id="input-date" required class="zine-input">
+          </div>
+          
+          <div class="form-group">
+            <label for="input-quantity">Qtd. de Maços:</label>
+            <input type="number" id="input-quantity" min="1" max="100" step="1" required class="zine-input" placeholder="ex: 1, 2 ou 10">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="input-unit-price">Valor Unitário do Maço (R$):</label>
+            <div class="input-money-wrapper">
+              <span class="currency-prefix">R$</span>
+              <input type="number" id="input-unit-price" min="0" step="0.10" required class="zine-input" placeholder="13.00">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="input-brand">Marca do Cigarro:</label>
+            <div class="brand-select-combo">
+              <select id="select-brand" class="zine-select">
+                <option value="Derby">Derby</option>
+                <option value="Carlton / Dunhill">Carlton / Dunhill</option>
+                <option value="Marlboro">Marlboro</option>
+                <option value="Lucky Strike">Lucky Strike</option>
+                <option value="Camel">Camel</option>
+                <option value="L&M">L&M</option>
+                <option value="Free / Kent">Free / Kent</option>
+                <option value="Rothmans">Rothmans</option>
+                <option value="__NEW__">+ Outra Marca...</option>
+              </select>
+              <input type="text" id="input-custom-brand" class="zine-input hidden" placeholder="Digite o nome da marca">
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtotal Preview -->
+        <div class="subtotal-calc-box">
+          <div class="subtotal-item">
+            <span>Cigarros adicionados:</span>
+            <strong id="subtotal-cigs-preview">20 cigarros</strong>
+          </div>
+          <div class="subtotal-item">
+            <span>Total da compra:</span>
+            <strong id="subtotal-price-preview" class="highlight-tomato-text">R$ 13,00</strong>
+          </div>
+        </div>
+
+        <div class="modal-footer-btns">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Cancelar</button>
+          <button type="submit" class="btn btn-tomato" id="btn-save-purchase">Salvar Lançamento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PRINT DO PLACAR (Canvas Generator para Feed & Stories) -->
+  <div class="modal-backdrop" id="print-modal" aria-hidden="true">
+    <div class="modal-card-zine print-modal-layout">
+      <button class="modal-close-btn" id="btn-close-print-modal">✕</button>
+      
+      <div class="print-config-pane">
+        <h2>Gerador de Print do Fumódromo</h2>
+        <p>Exporte o boletim de notas da fumaça em alta resolução para enviar no WhatsApp ou postar nos Stories.</p>
+
+        <div class="format-choice-btns">
+          <button class="btn btn-format active" data-format="story">📱 Formato Story (9:16)</button>
+          <button class="btn btn-format" data-format="feed">🖼️ Formato Feed (1:1)</button>
+        </div>
+
+        <div class="print-preview-actions">
+          <button class="btn btn-tomato btn-block" id="btn-download-canvas" style="margin-bottom: 0.6rem;">
+            📥 Baixar Imagem PNG
+          </button>
+          <button class="btn btn-primary btn-block" id="btn-share-whatsapp" style="background-color: #25d366; border-color: #128c7e; color: #fff;">
+            💬 Enviar pelo WhatsApp
+          </button>
+        </div>
+      </div>
+
+      <div class="print-preview-canvas-wrap">
+        <canvas id="export-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SIMULAÇÃO INTERATIVA (Testar o Cigarrômetro) -->
+  <div class="modal-backdrop" id="simulation-modal" aria-hidden="true">
+    <div class="modal-card-zine" style="max-width: 500px;">
+      <button class="modal-close-btn" id="btn-close-sim-modal">✕</button>
+      <div class="modal-header">
+        <h2>Modo Simulação 🧪</h2>
+        <p>Ajuste os valores para ver a brasa e o crescimento em fases sem alterar os dados reais salvos!</p>
+      </div>
+
+      <div class="sim-controls">
+        <label for="sim-range-cigs">Número de Cigarros Simulados: <strong id="sim-cigs-label">150</strong></label>
+        <input type="range" id="sim-range-cigs" min="0" max="3000" step="10" value="150" class="zine-range">
+
+        <div class="sim-presets">
+          <button class="btn btn-xs btn-secondary" data-sim="20">1 Maço (20)</button>
+          <button class="btn btn-xs btn-secondary" data-sim="100">5 Maços (100)</button>
+          <button class="btn btn-xs btn-secondary" data-sim="500">25 Maços (500)</button>
+          <button class="btn btn-xs btn-secondary" data-sim="1500">75 Maços (1500)</button>
+        </div>
+
+        <div class="sim-footer">
+          <button class="btn btn-primary btn-block" id="btn-exit-sim">Sair da Simulação</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de Notificação -->
+  <div class="toast-notification" id="toast-notify" aria-live="polite"></div>
+
+  <!-- Firebase SDKs (Compat v10) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <!-- Scripts do App -->
+  <script src="image-data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

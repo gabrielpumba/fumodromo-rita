@@ -1,0 +1,10 @@
+# Logs e arquivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# Backups e rascunhos temporários
+fumodromo-rita-original.png
+Gemini_Generated_Image_*.jpg
+*.tmp
